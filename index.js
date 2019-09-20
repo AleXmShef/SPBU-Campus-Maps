@@ -56,13 +56,14 @@ else {
 
         const stringParams = qs.stringify(ordered);
         const paramsHash = crypto
-            .createHmac('sha256', secretKey)
+            .createHmac('sha256', 'AYQudtptlxliZcqYQ80t')
             .update(stringParams)
             .digest()
             .toString('base64')
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=$/, '');
+        console.log('wtf');
         console.log(paramsHash);
         res.json(paramsHash);
     });
