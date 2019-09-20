@@ -9,7 +9,7 @@ connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, (req, res) => {
     //console.log(`Server started on port ${PORT}`);
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
