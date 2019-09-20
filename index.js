@@ -12,10 +12,10 @@ app.use(express.json({extended: false}));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, (req, res) => {
-    //console.log(`Server started on port ${PORT}`);
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Blank page\n');
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+});
+
+app.listen(PORT, () => {
     console.log('Hello world');
 });
