@@ -20,52 +20,13 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
 
     app.get('*', (req, res) => {
-        const urlParams = req.params;
-        const ordered = {};
-        Object.keys(urlParams).sort().forEach((key) => {
-            if (key.slice(0, 3) === 'vk_') {
-                ordered[key] = urlParams[key];
-            }
-        });
-
-        const stringParams = qs.stringify(ordered);
-        const paramsHash = crypto
-            .createHmac('sha256', 'AYQudtptlxliZcqYQ80t')
-            .update(stringParams)
-            .digest()
-            .toString('base64')
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=$/, '');
-        console.log(paramsHash === urlParams.sign);
-        res.json(paramsHash === urlParams.sign);
-        //res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
     });
 }
 
 else {
     app.get('/', (req, res) => {
-        //res.send('Hello World!')
-        const urlParams = req.params;
-        const ordered = {};
-        Object.keys(urlParams).sort().forEach((key) => {
-            if (key.slice(0, 3) === 'vk_') {
-                ordered[key] = urlParams[key];
-            }
-        });
-
-        const stringParams = qs.stringify(ordered);
-        const paramsHash = crypto
-            .createHmac('sha256', 'AYQudtptlxliZcqYQ80t')
-            .update(stringParams)
-            .digest()
-            .toString('base64')
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=$/, '');
-        console.log('wtf');
-        console.log(paramsHash);
-        res.json(paramsHash);
+        res.send('Fuck you')
     });
 }
 
