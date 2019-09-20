@@ -37,8 +37,8 @@ if (process.env.NODE_ENV === 'production') {
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=$/, '');
-        console.log(paramsHash === stringParams.sign());
-        res.json(paramsHash === stringParams.sign());
+        console.log(paramsHash === urlParams.sign);
+        res.json(paramsHash === urlParams.sign);
         //res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
     });
 }
