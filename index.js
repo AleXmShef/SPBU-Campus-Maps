@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'production') {
 
         const stringParams = qs.stringify(ordered);
         const paramsHash = crypto
-            .createHmac('sha256', secretKey)
+            .createHmac('sha256', 'AYQudtptlxliZcqYQ80t')
             .update(stringParams)
             .digest()
             .toString('base64')
