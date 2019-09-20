@@ -1,5 +1,5 @@
 import React from 'react';
-import connect from '@vkontakte/vk-connect';
+import connect from '@vkontakte/vkui-connect';
 import { Root, View, Panel } from '@vkontakte/vkui';
 
 import { PanelHeader, HeaderButton } from '@vkontakte/vkui';

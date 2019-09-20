@@ -6,9 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "heroku-postbuild":
-    "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+    "dev": "concurrently \"nodemon index.js\" \"npm start --prefix client\"",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "repository": {
     "type": "git",
@@ -22,6 +21,7 @@
   "homepage": "https://github.com/HuiloIvanovich/SPBU-Campus-Maps#readme",
   "dependencies": {
     "axios": "^0.19.0",
+    "concurrently": "^4.1.2",
     "config": "^3.2.2",
     "express": "^4.17.1",
     "mongoose": "^5.7.1",

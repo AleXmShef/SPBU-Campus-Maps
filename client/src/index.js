@@ -6,7 +6,7 @@ import connect from '@vkontakte/vk-connect';
 import App from './App';
 // import registerServiceWorker from './sw';
 
-// Init VK  Mini App
+// Init VK Mini App
 connect.send('VKWebAppInit', {});
 
 // Если вы хотите, чтобы ваше веб-приложение работало в оффлайне и загружалось быстрее,
