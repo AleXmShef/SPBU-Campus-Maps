@@ -19,4 +19,4 @@ const CampusSchema = new mongoose.Schema({
     }
 });
 
-module.exports = Campus = mongoose.model('campus_schema', UserSchema);
+module.exports = Campus = mongoose.model('campus_schema', CampusSchema);
