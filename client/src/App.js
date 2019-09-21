@@ -3,16 +3,13 @@ import connect from '@vkontakte/vkui-connect';
 import { Root, View, Panel } from '@vkontakte/vkui';
 
 import { PanelHeader, HeaderButton } from '@vkontakte/vkui';
-//import Icon24Back from '@vkontakte/icons/dist/24/back';
+import Icon24Back from '@vkontakte/icons/dist/24/back';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import { Group, List, Cell, Gallery, Header, Link } from '@vkontakte/vkui';
-//import { FormLayout, FormLayoutGroup, Input, RangeSlider, Checkbox, Button }from '@vkontakte/vkui';
+import { FormLayout, FormLayoutGroup, Input, RangeSlider, Checkbox, Button }from '@vkontakte/vkui';
 
 import '@vkontakte/vkui/dist/vkui.css';
-//import Home from './panels/Home';
-//import Persik from './panels/Persik';
-
 
 class App extends React.Component {
 	constructor(props) {
