@@ -1,8 +1,7 @@
 console.log('test');
 const express = require('express');
 const connectDB = require('./config/db');
-const qs = require('querystring');
-const crypto = require('crypto');
+const axios = require('axios');
 
 
 
@@ -33,3 +32,13 @@ else {
 app.listen(PORT, () => {
     console.log('Hello world');
 });
+
+setInterval(async () => {
+    try {
+        const resp = await axios.get("https://spbu-campus-maps.herokuapp.com/");
+        //console.log("requesting server for anti shutdown by heroku");
+    } catch (err) {
+        //console.error(err);
+    }
+    //console.log(resp.data);
+}, 120000);

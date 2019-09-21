@@ -7,7 +7,7 @@ const CampusSchema = new mongoose.Schema({
    },
     asset_url: {
        type: String,
-        required, true
+        required: true
     },
     adjacency_list: [{
       type: Number,
