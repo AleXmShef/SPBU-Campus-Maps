@@ -2,39 +2,18 @@ const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
     user_id: {
-        type: Number,
+        type: String,
         required: true
     },
     study_group: {
-        global: {
+        name: {
             type: String,
             required: true
         },
-        education_level: {
-            type: String,
-            required: true
-        },
-        study_program: {
-            type: String,
-            required: true
-        },
-        year: {
-            type: Number,
-            required: true
-        },
-        study_program_link: {
-            type: String,
-            required: true
-        },
-        group: {
-            type: String,
-            required: true
-        },
-        timetable_link: {
+        link: {
             type: String,
             required: true
         }
-
     }
 });
 

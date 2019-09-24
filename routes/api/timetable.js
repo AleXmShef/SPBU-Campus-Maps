@@ -40,18 +40,19 @@ router.get('/global', async (req, res) => {
 // @desc    Get education levels for given direction
 // @access  Public
 router.get('/education', async (req, res) => {
-    if(!req.body.global) {
-        res.status(400).json({message: "No global direction specified"});
+    if(!req.query.arg) {
+        console.log(req.query);
+        return res.status(400).json({message: "No global direction specified"});
     }
     try {
-        const temp = await axios.get(req.body.global,
+        const temp = await axios.get(req.query.arg,
             {headers: {
                     Cookie: '_culture=ru-ru'}
             });
         const data = await parser(temp.data, {
             education: group('#accordion .panel.panel-default', {
                 name: text('h4 a'),
-                link: href('h4 a', req.body.global)
+                link: href('h4 a', req.query.arg)
             })
         });
         if(!data) {
@@ -70,24 +71,27 @@ router.get('/education', async (req, res) => {
 // @desc    Get study program
 // @access  Public
 router.get('/program', async (req, res) => {
-    if(!req.body.education) {
+    if(!req.query.arg) {
         res.status(400).json({message: "No education level specified"});
     }
     try {
-        const temp = await axios.get(req.body.education,
+        const exp = /#\w*/;
+        const level = exp.exec(req.query.arg)[0];
+        console.log(level);
+        const temp = await axios.get(req.query.arg,
             {headers: {
                     Cookie: '_culture=ru-ru'}
             });
         const data = await parser(temp.data, {
-            program: group('#accordion .panel.panel-default .common-list-item.row', {
+            program: group(`${level} li`, {
                 name: text('.col-sm-5'),
+                link: req.query.arg
             })
         });
         if(!data) {
             res.status(500).json({error: "Cannot fetch any data"});
         }
         let imprdata = {program: Array()};
-        console.log(imprdata);
         data.program.forEach(element => {
            if(element.name !== "Образовательная программа") {
                imprdata.program.push(element);
@@ -105,16 +109,16 @@ router.get('/program', async (req, res) => {
 // @desc    Get study program's years
 // @access  Public
 router.get('/year', async (req, res) => {
-    if(!req.body.program || !req.body.education) {
-        res.status(400).json({message: "No education program specified"});
+    if(!req.query.name || !req.query.link) {
+        return res.status(400).json({message: "No education program specified"});
     }
     try {
-        const temp = await axios.get(req.body.education,
+        const temp = await axios.get(req.query.link,
             {headers: {
                     Cookie: '_culture=ru-ru'}
             });
         const data = await parser(temp.data, {
-            year: group('#accordion .panel.panel-default .common-list-item.row:contains("' + req.body.program + '") .col-sm-1', {
+            year: group('#accordion .panel.panel-default .common-list-item.row:contains("' + req.query.name + '") .col-sm-1', {
                 name: text('a'),
                 link: href('a', 'https://timetable.spbu.ru')
             })
@@ -134,11 +138,11 @@ router.get('/year', async (req, res) => {
 // @desc    Get study program's groups
 // @access  Public
 router.get('/group', async (req, res) => {
-    if(!req.body.year) {
+    if(!req.query.arg) {
         res.status(400).json({message: "No education year specified"});
     }
     try {
-        const temp = await axios.get(req.body.year,
+        const temp = await axios.get(req.query.arg,
             {headers: {
                     Cookie: '_culture=ru-ru'}
             });
@@ -151,7 +155,7 @@ router.get('/group', async (req, res) => {
         if(!data) {
             res.status(500).json({error: "Cannot fetch any data"});
         }
-        data.year.forEach(element => {
+        data.group.forEach(element => {
            element.link = element.link.replace('window.location.href=\'', 'timetable.spbu.ru').replace('\'', '');
         });
         res.json(data);
