@@ -5,9 +5,9 @@ import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 
 const osname = platform();
 
-const TimetableWeek = ({ id, go}) => {
+const TimetableWeek = ({ id, panelChange, viewChange}) => {
     return (<Panel id={id}>
-            <PanelHeader left={<HeaderButton onClick={go}>
+            <PanelHeader left={<HeaderButton data-panel='global' data-view='selection' onClick={viewChange}>
                 {<Icon24Settings/>}
             </HeaderButton>}>Расписание</PanelHeader>
 
@@ -16,7 +16,8 @@ const TimetableWeek = ({ id, go}) => {
 
 TimetableWeek.propTypes = {
     id: PropTypes.string.isRequired,
-    go: PropTypes.func.isRequired
+    panelChange: PropTypes.func.isRequired,
+    viewChange: PropTypes.func.isRequired,
 };
 
 export default TimetableWeek;

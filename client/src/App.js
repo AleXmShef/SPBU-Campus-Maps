@@ -39,7 +39,7 @@ class App extends React.Component {
 				{study_group: group, user_id: 'alexshef27'},
 				{headers: {'Constent-Type': 'application/json'}}
 				).then
-			(this.setState({activeView: 'timetable', activePanel: 'week'}));
+			(this.setState({activeView: 'timetable', activePanel: 'week', listData: []}));
 	};
 
 	componentDidMount() {
@@ -62,48 +62,64 @@ class App extends React.Component {
         }
 	}
 
-	onTimetablePanelChange = (e) => {
-		console.log(`switching to panel ${e.currentTarget.dataset.panel}`);
-		const activePanel = this.state.activePanel;
-		const toPanel = e.currentTarget.dataset.panel;
-		const key = e.currentTarget.dataset.key;
+	getListData(prevType, curType, key) {
+        const activePanel = prevType;
+        const toPanel = curType;
         let curListData = this.state.listData;
-        const list = curListData[this.timetableTypes.indexOf(activePanel)][activePanel];
-        console.log(curListData);
-        if(this.timetableTypes.indexOf(activePanel) < this.timetableTypes.indexOf(toPanel)) {
-            if (e.currentTarget.dataset.panel !== 'year') {
+        let list;
+        if(activePanel !== 'week')
+			list = curListData[this.timetableTypes.indexOf(activePanel)][activePanel];
+        if(this.timetableTypes.indexOf(toPanel) === 0) {
+            this.setState({listData: []});
+            let curListData = this.state.listData;
+            axios.get('/api/timetable/' + toPanel).then(res => {
+                curListData.push(res.data);
+                this.setState({listData: curListData});
+            });
+        }
+        else if(this.timetableTypes.indexOf(activePanel) < this.timetableTypes.indexOf(toPanel)) {
+            if (toPanel !== 'year') {
                 let args;
                 if (list[key].link) {
                     args = {arg: list[key].link};
                 }
-                else {
+                else if (list[key].name){
                     args = {arg: list[key].name};
                 }
+                else
+                    args = {};
                 axios.get('/api/timetable/' + toPanel, {params: args}).then(res => {
-                	curListData.push(res.data);
-                    this.setState({listData: curListData, activePanel: toPanel});
+                    curListData.push(res.data);
+                    this.setState({listData: curListData});
                 });
             }
             else {
                 let args;
-				args = {link: list[key].link, name: list[key].name};
+                args = {link: list[key].link, name: list[key].name};
                 console.log(toPanel);
                 axios.get('/api/timetable/' + toPanel, {params: args}).then(res => {
                     curListData.push(res.data);
-                    this.setState({listData: curListData, activePanel: toPanel});
-                    console.log(res.data)
+                    this.setState({listData: curListData});
                 });
-			}
+            }
         }
         else if (this.timetableTypes.indexOf(activePanel) > this.timetableTypes.indexOf(toPanel)) {
-        	curListData.pop();
-			this.setState({listData: curListData, activePanel: toPanel});
-		}
+            curListData.pop();
+            this.setState({listData: curListData});
+        }
+	}
+
+	onTimetablePanelChange = (e) => {
+		this.getListData(this.state.activePanel, e.currentTarget.dataset.panel, e.currentTarget.dataset.key);
+		this.setState({activePanel: e.currentTarget.dataset.panel});
 	};
 
     onViewChange = (e) => {
-        console.log(`switching to view ${e.currentTarget.dataset.to}`);
-        this.setState({ activeView: e.currentTarget.dataset.to })
+        console.log(`switching to view ${e.currentTarget.dataset.view}`);
+        this.setState({ activeView: e.currentTarget.dataset.view});
+		if(e.currentTarget.dataset.panel) {
+            this.onTimetablePanelChange(e);
+        }
     };
 
     onStoryChange = (e) => {
@@ -131,7 +147,7 @@ class App extends React.Component {
 			}>
 			<Root id='timetable' activeView={this.state.activeView}>
                 <View id='timetable' activePanel={this.state.activePanel}>
-                    <TimetableWeek id='week' go={this.onTimetablePanelChange}/>
+                    <TimetableWeek id='week' panelChange={this.onTimetablePanelChange} viewChange={this.onViewChange}/>
                 </View>
 				<View id='selection' activePanel={this.state.activePanel}>
 					{this.timetableTypes.map(value => {
