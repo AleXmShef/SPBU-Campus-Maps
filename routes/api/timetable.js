@@ -113,20 +113,31 @@ router.get('/year', async (req, res) => {
         return res.status(400).json({message: "No education program specified"});
     }
     try {
+        const exp = /#\w*/;
+        const level = exp.exec(req.query.link)[0];
+        console.log(level);
         const temp = await axios.get(req.query.link,
             {headers: {
                     Cookie: '_culture=ru-ru'}
             });
         const data = await parser(temp.data, {
-            year: group('#accordion .panel.panel-default .common-list-item.row:contains("' + req.query.name + '") .col-sm-1', {
-                name: text('a'),
-                link: href('a', 'https://timetable.spbu.ru')
+            study: group(`${level} li`, {
+                name: text('.col-sm-5'),
+                year: group('.col-sm-1', {
+                    name: text('a'),
+                    link: href('a', 'https://timetable.spbu.ru')
+                })
             })
         });
         if(!data) {
             res.status(500).json({error: "Cannot fetch any data"});
         }
-        res.json(data);
+        let cordata = {year: {}};
+        data.study.forEach(element => {
+            if(element.name === req.query.name)
+                cordata.year = element.year;
+        });
+        res.json(cordata);
     } catch (err) {
         console.log(err.message);
         console.log(err.request._header);

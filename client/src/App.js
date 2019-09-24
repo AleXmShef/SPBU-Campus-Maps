@@ -130,13 +130,13 @@ class App extends React.Component {
 				</Tabbar>
 			}>
 			<Root id='timetable' activeView={this.state.activeView}>
+                <View id='timetable' activePanel={this.state.activePanel}>
+                    <TimetableWeek id='week' go={this.onTimetablePanelChange}/>
+                </View>
 				<View id='selection' activePanel={this.state.activePanel}>
 					{this.timetableTypes.map(value => {
 						return <TimetableSelector key={value} id={value} registerUser={this.registerUser} viewChange={this.onViewChange} panelChange={this.onTimetablePanelChange} data={this.state.listData} idArray={this.timetableTypes}/>
 					})}
-				</View>
-				<View id='timetable' activePanel={this.state.activePanel}>
-                    <TimetableWeek id='week' go={this.onTimetablePanelChange}/>
 				</View>
 			</Root>
 			<Root id='info' activeView={this.state.activeView}>

@@ -28,15 +28,10 @@ router.post('/register', async (req, res) => {
         //Shouldn't be here
         return res.status(400).json({error: "No study group or user id specified"});
     }
-    let user = await User.findOne({user_id: req.body.user_id.toString()});
-    if(user) {
-        //User already exist
-        return res.status(400).json({error: "User already exist"});
-    }
-    user = new User;
+    let user = new User;
     user.user_id = req.body.user_id;
     user.study_group = req.body.study_group;
-    await user.save();
+    await User.updateOne({user_id: req.body.user_id}, {study_group: req.body.study_group}, {upsert: true});
     return res.json({msg: 'Success', study_group: user.study_group});
 });
 
