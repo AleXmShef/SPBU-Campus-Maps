@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
+    "dev-back": "nodemon index.js",
     "dev": "concurrently \"nodemon index.js\" \"npm start --prefix client\"",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
@@ -24,6 +25,8 @@
     "concurrently": "^4.1.2",
     "config": "^3.2.2",
     "express": "^4.17.1",
+    "form-data": "^2.5.1",
+    "html-to-json-data": "^1.6.0",
     "mongoose": "^5.7.1",
     "nodemon": "^1.19.2"
   }

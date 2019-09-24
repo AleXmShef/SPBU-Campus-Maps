@@ -2,13 +2,19 @@ const express = require('express');
 const axios = require('axios');
 const connectDB = require('./config/db');
 
+const users = require('./routes/api/users');
+const assets = require('./routes/api/assets');
+const timetable = require('./routes/api/timetable');
+
 const app = express();
 
 app.use(express.json({extended: false}));
 
 connectDB();
 
-const PORT = process.env.PORT || 5000;
+app.use('/api/users', users);
+app.use('/api/assets', assets);
+app.use('/api/timetable', timetable);
 
 // Server static assets if in production
 if (process.env.NODE_ENV === 'production') {
@@ -23,6 +29,8 @@ if (process.env.NODE_ENV === 'production') {
         res.send('Fuck you')
     });
 }
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log('Server started');
