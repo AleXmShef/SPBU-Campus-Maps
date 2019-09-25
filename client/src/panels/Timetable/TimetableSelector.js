@@ -6,7 +6,7 @@ import Icon24Back from '@vkontakte/icons/dist/24/back';
 
 const osname = platform();
 
-const TimetableSelector = ({ id, idArray, registerUser, panelChange, viewChange, data}) => {
+const TimetableSelector = ({ id, idArray, registerUser, setPopout, panelChange, viewChange, data}) => {
     return (<Panel id={id}>
         <PanelHeader left={idArray.indexOf(id) > 0 ? <HeaderButton onClick={panelChange} data-panel={idArray[idArray.findIndex(element => {return element === id}) - 1]}>
             {osname === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
@@ -22,7 +22,7 @@ const TimetableSelector = ({ id, idArray, registerUser, panelChange, viewChange,
                                      data-panel={idArray[idArray.indexOf(id) + 1]}
                                      data-view={'timetable'}>{value.name}
                                      </Cell>
-                    }) : <Cell>Nothing to show</Cell>
+                    }) : setPopout()//<Cell>Nothing to show</Cell>
                 }
             </List>
         </Group>
@@ -35,6 +35,7 @@ TimetableSelector.propTypes = {
     panelChange: PropTypes.func.isRequired,
     viewChange: PropTypes.func.isRequired,
     registerUser: PropTypes.func.isRequired,
+    setPopout: PropTypes.func.isRequired,
     data: PropTypes.array.isRequired
 };
 
