@@ -11,7 +11,7 @@ const Info = ({ id, setPopout}) => {
             <PanelHeader>хуй</PanelHeader>
             <Group title="Действия">
                 <List>
-                    <CellButton onClick={setPopout}>Подумать</CellButton>
+                    <CellButton onClick={() => {setPopout(1)}}>Подумать</CellButton>
                 </List>
             </Group>
         </Panel>

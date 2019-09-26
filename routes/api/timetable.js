@@ -7,8 +7,37 @@ const { group, text, number, href, src, uniq, attr } = require('html-to-json-dat
 // @route   GET api/timetable/weekly
 // @desc    Get current user's weekly timetable
 // @access  Public
-router.get('/weekly', (req, res) => {
-
+router.get('/weekly', async (req, res) => {
+    if(!req.query.arg) {
+        return res.status(400).json({message: "No study group specified"});
+    }
+    try {
+        console.log(req.query.arg);
+        const temp = await axios.get(req.query.arg,
+            {headers: {
+                    Cookie: '_culture=ru-ru'}
+            });
+        const data = await parser(temp.data, {
+            timetable: group('#accordion', {
+                days: group('.panel.panel-default', {
+                    day: text('div div h4'),
+                    lessons: group('.common-list-item.row',{
+                        datetime: text('.col-sm-2.studyevent-datetime div div span'),
+                        subject: text('.col-sm-4.studyevent-subject div div span'),
+                        locations: text('.col-sm-3.studyevent-locations div div span'),
+                        educators: text('.col-sm-3.studyevent-educators div div span span a')
+                    })
+                })
+            })
+        });
+        if(!data) {
+            res.status(500).json({error: "Cannot fetch any data"});
+        }
+        res.json(data);
+    } catch(err) {
+        //console.log(err);
+        res.status(500).send('Server error');
+    }
 });
 
 // @route   GET api/timetable/global
@@ -77,7 +106,6 @@ router.get('/program', async (req, res) => {
     try {
         const exp = /#\w*/;
         const level = exp.exec(req.query.arg)[0];
-        console.log(level);
         const temp = await axios.get(req.query.arg,
             {headers: {
                     Cookie: '_culture=ru-ru'}
@@ -115,7 +143,6 @@ router.get('/year', async (req, res) => {
     try {
         const exp = /#\w*/;
         const level = exp.exec(req.query.link)[0];
-        console.log(level);
         const temp = await axios.get(req.query.link,
             {headers: {
                     Cookie: '_culture=ru-ru'}
@@ -167,7 +194,7 @@ router.get('/group', async (req, res) => {
             res.status(500).json({error: "Cannot fetch any data"});
         }
         data.group.forEach(element => {
-           element.link = element.link.replace('window.location.href=\'', 'timetable.spbu.ru').replace('\'', '');
+           element.link = element.link.replace('window.location.href=\'', 'https://timetable.spbu.ru').replace('\'', '');
         });
         res.json(data);
     } catch (err) {

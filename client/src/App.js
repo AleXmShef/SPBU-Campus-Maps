@@ -22,11 +22,13 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
-			activeView: 'info-view',
-			activePanel: 'info-panel',
-			activeStory: 'info',
-			user_id: '',
+			activeView: 'timetable',
+			activePanel: 'week',
+			activeStory: 'timetable',
+            fetchedUser: {},
+			user_id: 0,
 			listData: [],
+            timetable: [],
             popout: null
 		};
 	}
@@ -36,38 +38,46 @@ class App extends React.Component {
 	registerUser = (group) => {
 		if(group)
 			axios.post('api/users/register',
-				{study_group: group, user_id: 'alexshef27'},
+				{study_group: group, user_id: this.state.user_id.toString()},
 				{headers: {'Constent-Type': 'application/json'}}
 				).then
-			(this.setState({activeView: 'timetable', activePanel: 'week', listData: []}));
+			(this.setState({activeView: 'timetable', activePanel: 'week', listData: []}), this.getTimetableWeekly());
 	};
 
 	componentDidMount() {
-		// connect.subscribe((e) => {
-		// 	switch (e.detail.type) {
-		// 		case 'VKWebAppGetUserInfoResult':
-		// 			this.setState({ fetchedUser: e.detail.data });
-		// 			break;
-		// 		default:
-		// 			console.log(e.detail.type);
-		// 	}
-		// });
-		// connect.send('VKWebAppGetUserInfo', {});
+        connect.send('VKWebAppGetUserInfo', {});
+		connect.subscribe((e) => {
+			switch (e.detail.type) {
+                case 'VKWebAppGetUserInfoResult':
+					this.setState({ fetchedUser: e.detail.data, user_id: e.detail.data.id});
+                    this.getTimetableWeekly();
+					break;
+				default:
+					console.log(e.detail.type);
+			}
+		});
 		if(this.state.activePanel === this.timetableTypes[0]) {
             let curListData = this.state.listData;
             axios.get('/api/timetable/' + this.state.activePanel).then(res => {
                 curListData.push(res.data);
-                this.setState({listData: curListData});
+                this.setState({listData: curListData, popout: null});
             });
         }
 	}
 
-    setPopout = () => {
-	    if(this.state.popout == null) {
-            this.setState({popout: <ScreenSpinner/>});
-            setTimeout(() => {
-                this.setState({popout: null})
-            }, 10000);
+    setPopout = (on) => {
+	    if(on === 1) {
+            if (this.state.popout === null) {
+                this.setState({popout: <ScreenSpinner/>});
+                setTimeout(() => {
+                    if (this.state.popout != null)
+                        this.setState({popout: null})
+                }, 30000);
+            }
+        }
+        else if (on === 0) {
+	        if(this.state.popout !== null)
+                this.setState({popout: null});
         }
     };
 
@@ -75,9 +85,10 @@ class App extends React.Component {
         const activePanel = prevType;
         const toPanel = curType;
         let curListData = this.state.listData;
+        this.setPopout(1);
         if(this.timetableTypes.indexOf(toPanel) === 0) {
-            this.setState({listData: []});
-            let curListData = this.state.listData;
+            //this.setState({listData: []});
+            let curListData = [];
             axios.get('/api/timetable/' + toPanel).then(res => {
                 curListData.push(res.data);
                 this.setState({listData: curListData, popout: null});
@@ -114,25 +125,49 @@ class App extends React.Component {
             curListData.pop();
             this.setState({listData: curListData, popout: null});
         }
+        else
+            this.setPopout(0);
 	}
+
+	getTimetableWeekly() {
+        if(this.state.user_id) {
+            this.setPopout(1);
+            axios.get('/api/users/current', {params: {user_id: this.state.user_id.toString()}}).then((res) => {
+                if(res.data.msg === "Success") {
+                    axios.get('/api/timetable/weekly', {params: {arg: res.data.study_group.link}}).then((res2) => {
+                        console.log(res2.data.timetable);
+                        this.setState({timetable: res2.data.timetable});
+                    })
+                }
+                this.setPopout(0);
+            });
+        }
+    }
+
+    onPanelChange = (e) => {
+	    if(e.currentTarget.dataset.panel === this.timetableTypes[0])
+            this.getListData(this.state.activePanel, e.currentTarget.dataset.panel);
+        console.log(`switching to panel ${e.currentTarget.dataset.panel}`);
+        this.setState({activePanel: e.currentTarget.dataset.panel});
+    };
 
 	onTimetablePanelChange = (e) => {
 		this.getListData(this.state.activePanel, e.currentTarget.dataset.panel, e.currentTarget.dataset.key);
 		console.log(`switching to panel ${e.currentTarget.dataset.panel}`);
-		this.setState({activePanel: e.currentTarget.dataset.panel});
+		this.onPanelChange(e);
 	};
 
     onViewChange = (e) => {
         console.log(`switching to view ${e.currentTarget.dataset.view}`);
         this.setState({ activeView: e.currentTarget.dataset.view});
 		if(e.currentTarget.dataset.panel) {
-            this.onTimetablePanelChange(e);
+            this.onPanelChange(e);
         }
     };
 
     onStoryChange = (e) => {
         console.log(`switching to story ${e.currentTarget.dataset.story}`);
-        this.setState({ activeStory: e.currentTarget.dataset.story })
+        this.setState({ activeStory: e.currentTarget.dataset.story });
         if(e.currentTarget.dataset.view) {
             this.onViewChange(e);
         }
@@ -162,7 +197,7 @@ class App extends React.Component {
 			}>
 			<Root id='timetable' activeView={this.state.activeView}>
                 <View id='timetable' activePanel={this.state.activePanel}>
-                    <TimetableWeek id='week' panelChange={this.onTimetablePanelChange} viewChange={this.onViewChange}/>
+                    <TimetableWeek id='week' timetable={this.state.timetable} panelChange={this.onPanelChange} viewChange={this.onViewChange}/>
                 </View>
 				<View id='selection' popout={this.state.popout} activePanel={this.state.activePanel}>
 					{this.timetableTypes.map(value => {

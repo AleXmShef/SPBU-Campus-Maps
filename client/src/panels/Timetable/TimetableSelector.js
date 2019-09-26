@@ -14,7 +14,7 @@ const TimetableSelector = ({ id, idArray, registerUser, setPopout, panelChange, 
         <Group title="Направления">
             <List>
                 {
-                    data[idArray.indexOf(id)] ? data[idArray.indexOf(id)][id].map((value) => {
+                    data[idArray.indexOf(id)] && data[idArray.indexOf(id)][id] ? data[idArray.indexOf(id)][id].map((value) => {
                         return <Cell expandable
                                      data-key = {data[idArray.indexOf(id)][id].findIndex(element=> {return element.name === value.name})}
                                      key = {data[idArray.indexOf(id)][id].findIndex(element=> {return element.name === value.name})}
@@ -22,7 +22,7 @@ const TimetableSelector = ({ id, idArray, registerUser, setPopout, panelChange, 
                                      data-panel={idArray[idArray.indexOf(id) + 1]}
                                      data-view={'timetable'}>{value.name}
                                      </Cell>
-                    }) : setPopout()//<Cell>Nothing to show</Cell>
+                    }) : <Cell></Cell>
                 }
             </List>
         </Group>

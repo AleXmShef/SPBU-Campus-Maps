@@ -8,13 +8,13 @@ const User = require('../../models/User');
 // @desc    Get current user's study group
 // @access  Public
 router.get('/current', async (req, res) => {
-    if(!req.body.user_id) {
+    if(!req.query.user_id) {
         res.status(400).json({error: "No user id specified"})
     }
-    const user = await User.findOne({user_id: req.body.user_id});
+    const user = await User.findOne({user_id: req.query.user_id});
     if(!user) {
        //User doesn't exist
-       return res.status(400).json({error: "User doesn't exist"});
+       return res.json({error: "User doesn't exist"});
     } else {
        return res.json({msg: 'Success', study_group: user.study_group});
     }
