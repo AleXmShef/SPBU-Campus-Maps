@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
     //Heroku anti shutdown request
     setInterval(async () => {
         try {
-            const resp = await axios.get("https://spbu-campus-maps.herokuapp.com/");
+            const resp = await axios.get("https://spbu-campus-maps-backup.herokuapp.com/");
         } catch (err) {
             //Basically impossible to end up here
             console.error(err);
