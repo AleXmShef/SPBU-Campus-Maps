@@ -3,14 +3,15 @@ import PropTypes from 'prop-types';
 import { Panel, List, Group, Div, PanelHeader, HeaderButton, Cell, IOS, platform } from '@vkontakte/vkui';
 import Icon28ChevronBack from '@vkontakte/icons/dist/28/chevron_back';
 import Icon24Back from '@vkontakte/icons/dist/24/back';
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel'
 
 const osname = platform();
 
-const TimetableSelector = ({ id, idArray, registerUser, setPopout, panelChange, viewChange, data}) => {
+const TimetableSelector = ({ id, idArray, registerUser, panelChange, viewChange, data}) => {
     return (<Panel id={id}>
         <PanelHeader left={idArray.indexOf(id) > 0 ? <HeaderButton onClick={panelChange} data-panel={idArray[idArray.findIndex(element => {return element === id}) - 1]}>
             {osname === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
-        </HeaderButton> : <Div></Div>}>Изменение расписания</PanelHeader>
+        </HeaderButton> : <HeaderButton onClick={viewChange} data-panel='week' data-view='timetable'><Icon24Cancel/></HeaderButton>}>Изменение расписания</PanelHeader>
         <Group title="Направления">
             <List>
                 {
@@ -35,7 +36,6 @@ TimetableSelector.propTypes = {
     panelChange: PropTypes.func.isRequired,
     viewChange: PropTypes.func.isRequired,
     registerUser: PropTypes.func.isRequired,
-    setPopout: PropTypes.func.isRequired,
     data: PropTypes.array.isRequired
 };
 

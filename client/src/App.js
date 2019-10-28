@@ -12,6 +12,8 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import TimetableSelector from './panels/Timetable/TimetableSelector';
 import TimetableWeek from './panels/Timetable/TimetableWeek';
+import TimetableTeacherSearch from './panels/Timetable/TimetableTeacherSearch';
+import TimetableTeacher from './panels/Timetable/TimetableTeacher';
 import Info from './panels/Info/Info';
 
 const axios = require('axios');
@@ -22,13 +24,16 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
-			activeView: 'timetable',
-			activePanel: 'week',
-			activeStory: 'timetable',
+		    activeView: 'timetable',
+            activePanel: 'week',
+            activeStory: 'timetable',
             fetchedUser: {},
-			user_id: 0,
-			listData: [],
+            user_id: 0,
+            listData: [],
             timetable: [],
+            teacherTimetable: [],
+            teacherSearch: '',
+            teacherSearchResult: [],
             popout: null
 		};
 	}
@@ -39,18 +44,19 @@ class App extends React.Component {
 		if(group)
 			axios.post('api/users/register',
 				{study_group: group, user_id: this.state.user_id.toString()},
-				{headers: {'Constent-Type': 'application/json'}}
+				{headers: {'Content-Type': 'application/json'}}
 				).then
 			(this.setState({activeView: 'timetable', activePanel: 'week', listData: []}), this.getTimetableWeekly());
 	};
 
 	componentDidMount() {
+	    this.setPopout(1);
         connect.send('VKWebAppGetUserInfo', {});
 		connect.subscribe((e) => {
 			switch (e.detail.type) {
                 case 'VKWebAppGetUserInfoResult':
 					this.setState({ fetchedUser: e.detail.data, user_id: e.detail.data.id});
-                    this.getTimetableWeekly();
+					this.getTimetableWeekly();
 					break;
 				default:
 					console.log(e.detail.type);
@@ -63,6 +69,7 @@ class App extends React.Component {
                 this.setState({listData: curListData, popout: null});
             });
         }
+        this.setPopout(0);
 	}
 
     setPopout = (on) => {
@@ -157,6 +164,12 @@ class App extends React.Component {
 		this.onPanelChange(e);
 	};
 
+	onTeacherPanelChange = (e) => {
+        this.onPanelChange(e);
+        this.setPopout(1);
+	    axios.get('/api/timetable/teacher/weekly', {params: {arg: e.currentTarget.dataset.link}}).then((res) => {console.log(res.data.timetable[0]); this.setState({teacherTimetable: res.data.timetable[0].days, popout: null})});
+    };
+
     onViewChange = (e) => {
         console.log(`switching to view ${e.currentTarget.dataset.view}`);
         this.setState({ activeView: e.currentTarget.dataset.view});
@@ -171,6 +184,12 @@ class App extends React.Component {
         if(e.currentTarget.dataset.view) {
             this.onViewChange(e);
         }
+    };
+
+    onSearchChange = (query) => {
+        this.setState({teacherSearch: query});
+        axios.get('/api/timetable/teacher/find', {params: {arg: query}})
+                .then((res) => {console.log(res.data); this.setState({teacherSearchResult: res.data.teachers})}, (rej) => {this.setState({teacherSearchResult: []})});
     };
 
 	render() {
@@ -197,7 +216,9 @@ class App extends React.Component {
 			}>
 			<Root id='timetable' activeView={this.state.activeView}>
                 <View id='timetable' activePanel={this.state.activePanel}>
-                    <TimetableWeek id='week' timetable={this.state.timetable} panelChange={this.onPanelChange} viewChange={this.onViewChange}/>
+                    <TimetableWeek id='week' setPopout={this.setPopout} timetable={this.state.timetable} panelChange={this.onPanelChange} viewChange={this.onViewChange}/>
+                    <TimetableTeacherSearch id='teacher-search' setPopout={this.setPopout} timetable={this.state.teacherSearchResult} searchValue={this.state.teacherSearch} onSearchChange={this.onSearchChange} panelChange={this.onTeacherPanelChange} viewChange={this.onViewChange}/>
+                    <TimetableTeacher id='teacher' setPopout={this.setPopout} timetable={this.state.teacherTimetable} panelChange={this.onPanelChange} viewChange={this.onViewChange}/>
                 </View>
 				<View id='selection' popout={this.state.popout} activePanel={this.state.activePanel}>
 					{this.timetableTypes.map(value => {

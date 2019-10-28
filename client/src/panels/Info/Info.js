@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Panel, List, Group, Div, PanelHeader, HeaderButton, CellButton, IOS, platform } from '@vkontakte/vkui';
-import Icon28ChevronBack from '@vkontakte/icons/dist/28/chevron_back';
-import Icon24Back from '@vkontakte/icons/dist/24/back';
+import { Panel, List, Group, PanelHeader, CellButton} from '@vkontakte/vkui';
 
-const osname = platform();
 
 const Info = ({ id, setPopout}) => {
     return (<Panel id={id}>

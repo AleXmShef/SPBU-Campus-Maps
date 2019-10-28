@@ -11,6 +11,7 @@ const TimetableWeek = ({ id, panelChange, timetable, viewChange}) => {
                 {<Icon24Settings/>}
             </HeaderButton>}>Расписание</PanelHeader>
             <List>
+                <Cell expandable onClick={panelChange} data-panel='teacher-search'>Расписание преподователя</Cell>
                 {timetable[0] ? timetable[0].days.map(day => {
                     return <Group
                         title={<Div>{day.day}</Div>}

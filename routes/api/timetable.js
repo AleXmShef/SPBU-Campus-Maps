@@ -204,4 +204,73 @@ router.get('/group', async (req, res) => {
     }
 });
 
+// @route   GET api/timetable/teacher/find
+// @desc    Get list of SPBU teachers by query
+// @access  Public
+router.get('/teacher/find', async (req, res) => {
+    if(!req.query.arg) {
+        res.status(400).json({message: "No teacher specified"});
+    }
+    try {
+        let request = `https://timetable.spbu.ru/EducatorEvents/Index?q=${req.query.arg}`;
+        request = encodeURI(request);
+        const temp = await axios.get(request,
+            {headers: {
+                    Cookie: '_culture=ru-ru'}
+            });
+        const data = await parser(temp.data, {
+            teachers: group('.tile', {
+                name: text('.col-sm-3'),
+                link: attr(':self', 'onclick')
+            })
+        });
+        if(!data) {
+            res.status(500).json({error: "Cannot fetch any data"});
+        }
+        data.teachers.forEach(element => {
+            element.link = element.link.replace('window.location.href=\'', 'https://timetable.spbu.ru').replace('\'', '');
+        });
+        res.json(data);
+    } catch (err) {
+        console.log("Server error: \n" + err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+// @route   GET api/timetable/teacher/weekly
+// @desc    Get teacher's timetable
+// @access  Public
+router.get('/teacher/weekly', async (req, res) => {
+    if(!req.query.arg) {
+        return res.status(400).json({message: "No study group specified"});
+    }
+    try {
+        console.log(req.query.arg);
+        const temp = await axios.get(req.query.arg,
+            {headers: {
+                    Cookie: '_culture=ru-ru'}
+            });
+        const data = await parser(temp.data, {
+            timetable: group('#accordion', {
+                days: group('.panel.panel-default', {
+                    day: text('div div h4'),
+                    lessons: group('.common-list-item.row',{
+                        datetime: text('.col-sm-2.studyevent-datetime div div span'),
+                        subject: text('.col-sm-4.studyevent-subject div div span'),
+                        locations: text('.col-sm-3.studyevent-locations div div span'),
+                        educators: text('.col-sm-3.studyevent-educators div div span span a')
+                    })
+                })
+            })
+        });
+        if(!data) {
+            res.status(500).json({error: "Cannot fetch any data"});
+        }
+        res.json(data);
+    } catch(err) {
+        //console.log(err);
+        res.status(500).send('Server error');
+    }
+});
+
 module.exports = router;
