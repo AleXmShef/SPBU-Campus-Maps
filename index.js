@@ -14,7 +14,7 @@ const timetable = require('./routes/api/timetable');
 
 
 
-//connectDB();
+connectDB();
 
 app.use('/api/users', users);
 app.use('/api/assets', assets);
