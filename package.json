@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "form-data": "^2.5.1",
     "html-to-json-data": "^1.6.0",
-    "mongoose": "^5.7.1",
+    "mongoose": "^5.7.5",
     "nodemon": "^1.19.2"
   }
 }
